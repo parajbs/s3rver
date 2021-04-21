@@ -11,7 +11,7 @@ const instance = new S3rver({
   port: 80,
   address: 'S3domain',
   silent: false,
-  logfile: false,
+  logfile: true,
   serviceEndpoint: 'S3domain',
   directory: './tmp/s3rver',
   resetOnClose: false,
@@ -26,6 +26,8 @@ const instance = new S3rver({
       name: 'test-bucket',
     },
   ],
+  defaultAccessKeyId: 'S3RVER',
+  defaultSecretAccessKey: 'S3RVER',
 }).run((err, { address, port } = {}) => {
   if (err) {
     console.error(err);
