@@ -112,6 +112,7 @@ Creates a S3rver instance
 | key                            | `string` \| `Buffer` |                 | Private key for running with TLS
 | cert                           | `string` \| `Buffer` |                 | Certificate for running with TLS
 | silent                         | `boolean`            | `false`         | Suppress log messages
+| logfile                        | `boolean`            | `false`         | Enable to create a log in tmp/logfiles/console.log
 | serviceEndpoint                | `string`             | `amazonaws.com` | Override the AWS service root for subdomain-style access
 | directory                      | `string`             |                 | Data directory
 | resetOnClose                   | `boolean`            | `false`         | Remove all bucket data on server close
