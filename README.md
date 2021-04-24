@@ -119,6 +119,10 @@ Creates a S3rver instance
 | vhostBuckets                   | `boolean`            | `true`          | Allow vhost-style access for all buckets
 | configureBuckets\[].name       | `string`             |                 | The name of a prefabricated bucket to create when the server starts
 | configureBuckets\[].configs\[] | `string` \| `Buffer` |                 | Raw XML string or Buffer of Bucket config
+| defaultAccountId               | `number`             | `123456789000`  | default Account-Id
+| defaultAccountDisplayName      | `string`             | `S3RVER`        | default Account DisplayName
+| defaultAccessKeyId             | `string`             | `S3RVER`        | default AccessKeyId
+| defaultSecretAccessKey         | `string`             | `S3RVER`        | default SecretAccessKey
 <!-- prettier-ignore-end -->
 
 For your convenience, we've provided sample bucket configurations you can access using `require.resolve`:
@@ -191,6 +195,9 @@ You can subscribe to notifications for PUT, POST, COPY and DELETE object events 
 Please refer to [AWS's documentation](http://docs.aws.amazon.com/AmazonS3/latest/dev/notification-content-structure.html) for details of event object.
 
 ```javascript
+
+const os = require('os');
+const fs = require('fs');
 const S3rver = require('s3rver');
 const { fromEvent } = require('rxjs');
 const { filter } = require('rxjs/operators');
@@ -213,6 +220,7 @@ s3Events.subscribe((event) => console.log(event));
 s3Events
   .pipe(filter((event) => event.Records[0].eventName == 'ObjectCreated:Copy'))
   .subscribe((event) => console.log(event));
+
 ```
 
 ## Using [s3fs-fuse](https://github.com/s3fs-fuse/s3fs-fuse) with S3rver
