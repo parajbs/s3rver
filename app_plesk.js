@@ -8,11 +8,12 @@ const corsConfig = require.resolve('./example/cors.xml');
 const websiteConfig = require.resolve('./example/website.xml');
 
 const instance = new S3rver({
-  port: 80,
-  address: 'S3domain',
+  address: process.env.S3address || '0.0.0.0',
+  port: process.env.S3port || 80,
+  key: undefined,
+  cert: undefined,
   silent: false,
-  logfile: false,
-  serviceEndpoint: 'S3domain',
+  serviceEndpoint: process.env.S3endpoint || 'S3domain',
   directory: './tmp/s3rver',
   resetOnClose: false,
   allowMismatchedSignatures: true,
