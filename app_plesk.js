@@ -13,6 +13,7 @@ const instance = new S3rver({
   key: undefined,
   cert: undefined,
   silent: false,
+  logfile: true,
   serviceEndpoint: process.env.S3endpoint || 'amazonaws.com',
   directory: './tmp/s3rver',
   resetOnClose: false,
