@@ -2,9 +2,10 @@
 
 const AWS = require('aws-sdk');
 const { expect } = require('chai');
+const { once } = require('events');
 const express = require('express');
 const FormData = require('form-data');
-const fs = require('fs-extra');
+const fs = require('fs');
 const crypto = require('crypto');
 const request = require('request-promise-native').defaults({
   resolveWithFullResponse: true,
@@ -13,7 +14,6 @@ const request = require('request-promise-native').defaults({
 const { createServerAndClient, generateTestObjects } = require('./helpers');
 
 const S3rver = require('../lib/s3rver');
-const { once } = require('../lib/utils');
 
 describe('S3rver', () => {
   describe('#run', () => {
@@ -175,7 +175,7 @@ describe('S3rver', () => {
       form.append('key', 'testPostKey');
       form.append('file', body);
       await request.post('bucket-a', {
-        baseUrl: s3Client.config.endpoint,
+        baseUrl: s3Client.endpoint.href,
         body: form,
         headers: form.getHeaders(),
       });
