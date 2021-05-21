@@ -1,5 +1,5 @@
 const os = require('os');
-const fs = require('fs');
+const fs = require('fs-extra');
 const S3rver = require('./lib/s3rver');
 const { fromEvent } = require('rxjs');
 const { filter } = require('rxjs/operators');
