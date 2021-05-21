@@ -42,7 +42,7 @@
     "test": "./test"
   },
   "engines": {
-    "node": ">=12.13.0"
+    "node": ">=12.4.0"
   },
   "dependencies": {
     "@koa/router": "^10.0.0",
