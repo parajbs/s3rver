@@ -15,19 +15,23 @@ const instance = new S3rver({
   silent: false,
   logfile: true,
   serviceEndpoint: process.env.S3endpoint || 'amazonaws.com',
-  directory: './tmp/s3rver',
+  directory: './tmp/s3rver/',
   resetOnClose: false,
-  allowMismatchedSignatures: true,
+  allowMismatchedSignatures: false,
   vhostBuckets: false,
   configureBuckets: [
     {
-      name: 'conf_web',
+      name: 'conf-web',
       configs: [fs.readFileSync(corsConfig), fs.readFileSync(websiteConfig)],
     },
     {
       name: 'test-bucket',
     },
   ],
+  defaultAccountDisplayName: process.env.defaultAccountDisplayName || 'S3rver',
+  defaultAccessKeyId: process.env.defaultAccessKeyId || 'S3RVER',
+  defaultSecretAccessKey: process.env.defaultSecretAccessKey || 'S3RVER',
+  privatebuckets: process.env.privatebuckets || true,
 }).run((err, { address, port } = {}) => {
   if (err) {
     console.error(err);
