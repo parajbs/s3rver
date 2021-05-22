@@ -27,10 +27,10 @@ const instance = new S3rver({
       name: 'test-bucket',
     },
   ],
-  logfile: true,
-  defaultAccountDisplayName: process.env.defaultAccountDisplayName || 'S3rver',
-  defaultAccessKeyId: process.env.defaultAccessKeyId || 'S3RVER',
-  defaultSecretAccessKey: process.env.defaultSecretAccessKey || 'S3RVER',
+//  logfile: true,
+//  defaultAccountDisplayName: process.env.defaultAccountDisplayName || 'S3rver',
+//  defaultAccessKeyId: process.env.defaultAccessKeyId || 'S3RVER',
+//  defaultSecretAccessKey: process.env.defaultSecretAccessKey || 'S3RVER',
 //  privatebuckets: process.env.privatebuckets || true,
 }).run((err, { address, port } = {}) => {
   if (err) {
