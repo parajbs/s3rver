@@ -1,11 +1,12 @@
 'use strict';
 
 const { expect } = require('chai');
+const { once } = require('events');
 const express = require('express');
 const FormData = require('form-data');
-const fs = require('fs-extra');
+const fs = require('fs');
+const http = require('http');
 const { find, times } = require('lodash');
-const crypto = require('crypto');
 const moment = require('moment');
 const pMap = require('p-map');
 const request = require('request-promise-native').defaults({
@@ -13,9 +14,13 @@ const request = require('request-promise-native').defaults({
 });
 const { URL, URLSearchParams } = require('url');
 
-const { createServerAndClient, generateTestObjects } = require('../helpers');
-
-const md5 = (data) => crypto.createHash('md5').update(data).digest('hex');
+const {
+  createServerAndClient,
+  generateTestObjects,
+  md5,
+  parseXml,
+  StreamingRequestSigner,
+} = require('../helpers');
 
 describe('Operations on Objects', () => {
   let s3rver;
@@ -124,7 +129,7 @@ describe('Operations on Objects', () => {
 
     it('gets an image from a bucket', async function () {
       const file = require.resolve('../fixtures/image0.jpg');
-      const data = await fs.readFile(file);
+      const data = await fs.promises.readFile(file);
       await s3Client
         .putObject({
           Bucket: 'bucket-a',
@@ -161,7 +166,7 @@ describe('Operations on Objects', () => {
         .putObject({
           Bucket: 'bucket-a',
           Key: 'image',
-          Body: await fs.readFile(file),
+          Body: await fs.promises.readFile(file),
           ContentType: 'image/jpeg',
         })
         .promise();
@@ -178,14 +183,60 @@ describe('Operations on Objects', () => {
       expect(res.headers).to.have.property('content-length', '100');
     });
 
-    it('returns 416 error for out of bounds range requests', async function () {
+    it('gets a response without range headers when no range is specified in the request', async function () {
       const file = require.resolve('../fixtures/image0.jpg');
-      const filesize = fs.statSync(file).size;
       await s3Client
         .putObject({
           Bucket: 'bucket-a',
           Key: 'image',
-          Body: await fs.readFile(file),
+          Body: await fs.promises.readFile(file),
+          ContentType: 'image/jpeg',
+        })
+        .promise();
+      const url = s3Client.getSignedUrl('getObject', {
+        Bucket: 'bucket-a',
+        Key: 'image',
+      });
+      const res = await request(url, {
+        headers: {},
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.headers).to.not.have.property('content-range');
+      expect(res.headers).to.have.property('accept-ranges');
+      expect(res.headers).to.have.property('content-length', '52359');
+    });
+
+    it('gets a response with range headers when the requested range starts on byte 0 and no end', async function () {
+      const file = require.resolve('../fixtures/image0.jpg');
+      await s3Client
+        .putObject({
+          Bucket: 'bucket-a',
+          Key: 'image',
+          Body: await fs.promises.readFile(file),
+          ContentType: 'image/jpeg',
+        })
+        .promise();
+      const url = s3Client.getSignedUrl('getObject', {
+        Bucket: 'bucket-a',
+        Key: 'image',
+      });
+      const res = await request(url, {
+        headers: { range: 'bytes=0-' },
+      });
+      expect(res.statusCode).to.equal(206);
+      expect(res.headers).to.have.property('content-range');
+      expect(res.headers).to.have.property('accept-ranges');
+      expect(res.headers).to.have.property('content-length', '52359');
+    });
+
+    it('returns 416 error for out of bounds range requests', async function () {
+      const file = require.resolve('../fixtures/image0.jpg');
+      const { size: filesize } = fs.statSync(file);
+      await s3Client
+        .putObject({
+          Bucket: 'bucket-a',
+          Key: 'image',
+          Body: await fs.promises.readFile(file),
           ContentType: 'image/jpeg',
         })
         .promise();
@@ -208,12 +259,12 @@ describe('Operations on Objects', () => {
 
     it('returns actual length of data for partial out of bounds range requests', async function () {
       const file = require.resolve('../fixtures/image0.jpg');
-      const filesize = fs.statSync(file).size;
+      const { size: filesize } = fs.statSync(file);
       await s3Client
         .putObject({
           Bucket: 'bucket-a',
           Key: 'image',
-          Body: await fs.readFile(file),
+          Body: await fs.promises.readFile(file),
           ContentType: 'image/jpeg',
         })
         .promise();
@@ -254,7 +305,7 @@ describe('Operations on Objects', () => {
 
     it('returns image metadata from a bucket in HEAD request', async function () {
       const file = require.resolve('../fixtures/image0.jpg');
-      const fileContent = await fs.readFile(file);
+      const fileContent = await fs.promises.readFile(file);
       await s3Client
         .putObject({
           Bucket: 'bucket-a',
@@ -330,7 +381,7 @@ describe('Operations on Objects', () => {
       form.append('key', 'text');
       form.append('file', 'Hello!', 'post_file.txt');
       const res = await request.post('bucket-a', {
-        baseUrl: s3Client.config.endpoint,
+        baseUrl: s3Client.endpoint.href,
         body: form,
         headers: form.getHeaders(),
       });
@@ -346,7 +397,7 @@ describe('Operations on Objects', () => {
       let res;
       try {
         res = await request.post('bucket-a', {
-          baseUrl: s3Client.config.endpoint,
+          baseUrl: s3Client.endpoint.href,
           body: new URLSearchParams({
             key: 'text',
             file: 'Hello!',
@@ -366,7 +417,7 @@ describe('Operations on Objects', () => {
       form.append('key', 'text');
       form.append('file', 'Hello!');
       const res = await request.post('bucket-a', {
-        baseUrl: s3Client.config.endpoint,
+        baseUrl: s3Client.endpoint.href,
         body: form,
         headers: form.getHeaders(),
       });
@@ -384,7 +435,7 @@ describe('Operations on Objects', () => {
       form.append('Content-Type', 'text/plain');
       form.append('file', 'Hello!', 'post_file.txt');
       const res = await request.post('bucket-a', {
-        baseUrl: s3Client.config.endpoint,
+        baseUrl: s3Client.endpoint.href,
         body: form,
         headers: form.getHeaders(),
       });
@@ -402,14 +453,14 @@ describe('Operations on Objects', () => {
       form.append('key', 'image');
       form.append('file', fs.createReadStream(file));
       const res = await request.post('bucket-a', {
-        baseUrl: s3Client.config.endpoint,
+        baseUrl: s3Client.endpoint.href,
         body: form,
         headers: form.getHeaders(),
       });
       expect(res.statusCode).to.equal(204);
       expect(res.headers).to.have.property(
         'location',
-        new URL('/bucket-a/image', s3Client.config.endpoint).href,
+        new URL('/bucket-a/image', s3Client.endpoint.href).href,
       );
       const objectRes = await request(res.headers.location, {
         encoding: null,
@@ -423,7 +474,7 @@ describe('Operations on Objects', () => {
       form.append('key', 'image');
       form.append('file', fs.createReadStream(file));
       const res = await request.post('', {
-        baseUrl: s3Client.config.endpoint,
+        baseUrl: s3Client.endpoint.href,
         body: form,
         headers: {
           host: 'bucket-a',
@@ -443,7 +494,7 @@ describe('Operations on Objects', () => {
       form.append('key', 'image');
       form.append('file', fs.createReadStream(file));
       const res = await request.post('', {
-        baseUrl: s3Client.config.endpoint,
+        baseUrl: s3Client.endpoint.href,
         body: form,
         headers: {
           host: 'bucket-a.s3.amazonaws.com',
@@ -463,7 +514,7 @@ describe('Operations on Objects', () => {
       form.append('success_action_status', '200');
       form.append('file', 'Hello!');
       const res = await request.post('bucket-a', {
-        baseUrl: s3Client.config.endpoint,
+        baseUrl: s3Client.endpoint.href,
         body: form,
         headers: form.getHeaders(),
       });
@@ -478,7 +529,7 @@ describe('Operations on Objects', () => {
       form.append('success_action_status', '201');
       form.append('file', 'Hello!');
       const res = await request.post('bucket-a', {
-        baseUrl: s3Client.config.endpoint,
+        baseUrl: s3Client.endpoint.href,
         body: form,
         headers: form.getHeaders(),
       });
@@ -494,7 +545,7 @@ describe('Operations on Objects', () => {
       form.append('success_action_status', '301');
       form.append('file', 'Hello!');
       const res = await request.post('bucket-a', {
-        baseUrl: s3Client.config.endpoint,
+        baseUrl: s3Client.endpoint.href,
         body: form,
         headers: form.getHeaders(),
       });
@@ -510,7 +561,7 @@ describe('Operations on Objects', () => {
       let res;
       try {
         res = await request.post('bucket-a', {
-          baseUrl: s3Client.config.endpoint,
+          baseUrl: s3Client.endpoint.href,
           body: form,
           headers: form.getHeaders(),
         });
@@ -538,7 +589,7 @@ describe('Operations on Objects', () => {
       let res;
       try {
         res = await request.post('bucket-a', {
-          baseUrl: s3Client.config.endpoint,
+          baseUrl: s3Client.endpoint.href,
           body: form,
           headers: form.getHeaders(),
         });
@@ -561,7 +612,7 @@ describe('Operations on Objects', () => {
       let res;
       try {
         res = await request.post('bucket-a', {
-          baseUrl: s3Client.config.endpoint,
+          baseUrl: s3Client.endpoint.href,
           body: form,
           headers: form.getHeaders(),
         });
@@ -584,7 +635,7 @@ describe('Operations on Objects', () => {
       let res;
       try {
         res = await request.post('bucket-a', {
-          baseUrl: s3Client.config.endpoint,
+          baseUrl: s3Client.endpoint.href,
           body: form,
           headers: form.getHeaders(),
         });
@@ -601,7 +652,7 @@ describe('Operations on Objects', () => {
       form.append('Content-Type', 'text/plain');
       form.append('success_action_status', '200');
       const res = await request.post('bucket-a', {
-        baseUrl: s3Client.config.endpoint,
+        baseUrl: s3Client.endpoint.href,
         body: form,
         headers: form.getHeaders(),
       });
@@ -621,7 +672,7 @@ describe('Operations on Objects', () => {
       let res;
       try {
         res = await request.post('bucket-a', {
-          baseUrl: s3Client.config.endpoint,
+          baseUrl: s3Client.endpoint.href,
           body: form,
           headers: form.getHeaders(),
         });
@@ -641,7 +692,7 @@ describe('Operations on Objects', () => {
       let res;
       try {
         res = await request.post('bucket-a', {
-          baseUrl: s3Client.config.endpoint,
+          baseUrl: s3Client.endpoint.href,
           body: form,
           headers: form.getHeaders(),
         });
@@ -660,7 +711,7 @@ describe('Operations on Objects', () => {
       let res;
       try {
         res = await request.post('bucket-a', {
-          baseUrl: s3Client.config.endpoint,
+          baseUrl: s3Client.endpoint.href,
           body: form,
           headers: form.getHeaders(),
         });
@@ -693,7 +744,7 @@ describe('Operations on Objects', () => {
         .putObject({
           Bucket: 'bucket-a',
           Key: 'image',
-          Body: await fs.readFile(files[0]),
+          Body: await fs.promises.readFile(files[0]),
           ContentType: 'image/jpeg',
         })
         .promise();
@@ -706,7 +757,7 @@ describe('Operations on Objects', () => {
         .putObject({
           Bucket: 'bucket-a',
           Key: 'image',
-          Body: await fs.readFile(files[1]),
+          Body: await fs.promises.readFile(files[1]),
           ContentType: 'image/jpeg',
         })
         .promise();
@@ -763,7 +814,7 @@ describe('Operations on Objects', () => {
 
     it('stores a text object with no content type and retrieves it', async function () {
       const res = await request.put('bucket-a/text', {
-        baseUrl: s3Client.config.endpoint,
+        baseUrl: s3Client.endpoint.href,
         body: 'Hello!',
       });
       expect(res.statusCode).to.equal(200);
@@ -797,7 +848,7 @@ describe('Operations on Objects', () => {
         .putObject({
           Bucket: 'bucket-a',
           Key: 'image',
-          Body: await fs.readFile(file),
+          Body: await fs.promises.readFile(file),
           ContentType: 'image/jpeg',
         })
         .promise();
@@ -810,7 +861,7 @@ describe('Operations on Objects', () => {
       const params = {
         Bucket: 'bucket-a',
         Key: 'jquery',
-        Body: await fs.readFile(file),
+        Body: await fs.promises.readFile(file),
         ContentType: 'application/javascript',
         ContentEncoding: 'gzip',
       };
@@ -858,6 +909,212 @@ describe('Operations on Objects', () => {
         .putObject({ Bucket: bucket, Key: 'foo2.txt', Body: 'Hello2!' })
         .promise();
     });
+
+    it('stores an object with a storage class', async function () {
+      await s3Client
+        .putObject({
+          Bucket: 'bucket-a',
+          Key: 'somekey',
+          Body: 'Hello!',
+          StorageClass: 'STANDARD_IA',
+        })
+        .promise();
+      const object = await s3Client
+        .getObject({
+          Bucket: 'bucket-a',
+          Key: 'somekey',
+        })
+        .promise();
+      expect(object.ETag).to.equal(JSON.stringify(md5('Hello!')));
+      expect(object.StorageClass).to.equal('STANDARD_IA');
+    });
+
+    it('fails to store an object with an invalid storage class', async function () {
+      let error;
+      try {
+        await s3Client
+          .putObject({
+            Bucket: 'bucket-a',
+            Key: 'somekey',
+            Body: 'Hello!',
+            StorageClass: 'BAD_STORAGE',
+          })
+          .promise();
+      } catch (err) {
+        error = err;
+      }
+      expect(error).to.exist;
+      expect(error.code).to.equal('InvalidStorageClass');
+    });
+
+    describe('Chunked Upload', () => {
+      const CRLF = '\r\n';
+      const createSigner = (request, chunks) => {
+        return new StreamingRequestSigner(
+          {
+            method: 'PUT',
+            protocol: s3Client.endpoint.protocol,
+            hostname: s3Client.endpoint.hostname,
+            port: s3Client.endpoint.port,
+            path: s3Client.endpoint.path + `${request.Bucket}/${request.Key}`,
+            headers: {
+              'X-Amz-Decoded-Content-Length': chunks.reduce(
+                (length, chunk) => length + chunk.length,
+                0,
+              ),
+            },
+          },
+          s3Client.config.credentials,
+        );
+      };
+
+      it('stores an object using chunked transfer encoding', async function () {
+        const chunks = [Buffer.alloc(8192), 'Hello!', ''];
+        const signer = createSigner(
+          { Bucket: 'bucket-a', Key: 'text' },
+          chunks,
+        );
+        const opts = signer.sign();
+        const req = http.request(opts);
+        for (const chunk of chunks) {
+          const signed = signer.signChunk(chunk);
+          req.write(signed);
+          req.write(CRLF);
+          req.write(chunk);
+          req.write(CRLF);
+        }
+        const [res] = await once(req.end(), 'response');
+        let resBodyString = '';
+        for await (const chunk of res) {
+          resBodyString += chunk.toString();
+        }
+        const resBody = parseXml(resBodyString);
+        expect(resBody).to.be.empty;
+        expect(res.statusCode).to.equal(200);
+        const object = await s3Client
+          .getObject({ Bucket: 'bucket-a', Key: 'text' })
+          .promise();
+        expect(object.Body.slice(8192).toString()).to.equal('Hello!');
+      });
+
+      it('fails to store an object when an initial chunk is smaller than 8KB', async function () {
+        const chunks = [Buffer.alloc(8192), 'error', 'Hello!', ''];
+        const signer = createSigner(
+          { Bucket: 'bucket-a', Key: 'text' },
+          chunks,
+        );
+        const opts = signer.sign();
+        const req = http.request(opts);
+        for (const chunk of chunks) {
+          const signed = signer.signChunk(chunk);
+          req.write(signed);
+          req.write('\r\n');
+          req.write(chunk);
+          req.write('\r\n');
+        }
+        const [res] = await once(req.end(), 'response');
+        let resBodyString = '';
+        for await (const chunk of res) {
+          resBodyString += chunk.toString();
+        }
+        const resBody = parseXml(resBodyString);
+        expect(res.statusCode).to.equal(403);
+        expect(resBody.Error).to.include({
+          Code: 'InvalidChunkSizeError',
+          Message:
+            'Only the last chunk is allowed to have a size less than 8192 bytes',
+          Chunk: 3,
+          BadChunkSize: chunks[1].length,
+        });
+      });
+
+      it('fails to store an object when a chunked transfer terminates with a non-empty chunk', async function () {
+        const chunks = ['Hello!'];
+        const signer = createSigner(
+          { Bucket: 'bucket-a', Key: 'text' },
+          chunks,
+        );
+        const opts = signer.sign();
+        const req = http.request(opts);
+        for (const chunk of chunks) {
+          const signed = signer.signChunk(chunk);
+          req.write(signed);
+          req.write('\r\n');
+          req.write(chunk);
+          req.write('\r\n');
+        }
+        const [res] = await once(req.end(), 'response');
+        let resBodyString = '';
+        for await (const chunk of res) {
+          resBodyString += chunk.toString();
+        }
+        const resBody = parseXml(resBodyString);
+        expect(res.statusCode).to.equal(400);
+        expect(resBody.Error).to.include({
+          Code: 'IncompleteBody',
+          Message: 'The request body terminated unexpectedly',
+        });
+      });
+
+      it('fails to store an object when no decoded content length is provided', async function () {
+        const chunks = ['Hello!', ''];
+        const signer = createSigner(
+          { Bucket: 'bucket-a', Key: 'text' },
+          chunks,
+        );
+        delete signer.request.headers['X-Amz-Decoded-Content-Length'];
+        const opts = signer.sign();
+        const req = http.request(opts);
+        for (const chunk of chunks) {
+          const signed = signer.signChunk(chunk);
+          req.write(signed);
+          req.write('\r\n');
+          req.write(chunk);
+          req.write('\r\n');
+        }
+        const [res] = await once(req.end(), 'response');
+        let resBodyString = '';
+        for await (const chunk of res) {
+          resBodyString += chunk.toString();
+        }
+        const resBody = parseXml(resBodyString);
+        expect(res.statusCode).to.equal(411);
+        expect(resBody.Error).to.include({
+          Code: 'MissingContentLength',
+          Message: 'You must provide the Content-Length HTTP header.',
+        });
+      });
+
+      it('fails to store an object when the decoded content length does not match', async function () {
+        const chunks = ['Hello!', ''];
+        const signer = createSigner(
+          { Bucket: 'bucket-a', Key: 'text' },
+          chunks,
+        );
+        signer.request.headers['X-Amz-Decoded-Content-Length'] += 1;
+        const opts = signer.sign();
+        const req = http.request(opts);
+        for (const chunk of chunks) {
+          const signed = signer.signChunk(chunk);
+          req.write(signed);
+          req.write('\r\n');
+          req.write(chunk);
+          req.write('\r\n');
+        }
+        const [res] = await once(req.end(), 'response');
+        let resBodyString = '';
+        for await (const chunk of res) {
+          resBodyString += chunk.toString();
+        }
+        const resBody = parseXml(resBodyString);
+        expect(res.statusCode).to.equal(400);
+        expect(resBody.Error).to.include({
+          Code: 'IncompleteBody',
+          Message:
+            'You did not provide the number of bytes specified by the Content-Length HTTP header',
+        });
+      });
+    });
   });
 
   describe('PUT Object - Copy', () => {
@@ -870,7 +1127,7 @@ describe('Operations on Objects', () => {
         .putObject({
           Bucket: 'bucket-a',
           Key: srcKey,
-          Body: await fs.readFile(file),
+          Body: await fs.promises.readFile(file),
           ContentType: 'image/jpeg',
         })
         .promise();
@@ -902,7 +1159,7 @@ describe('Operations on Objects', () => {
         .putObject({
           Bucket: 'bucket-a',
           Key: srcKey,
-          Body: await fs.readFile(file),
+          Body: await fs.promises.readFile(file),
           ContentType: 'image/jpeg',
           Metadata: {
             someKey: 'value',
@@ -935,7 +1192,7 @@ describe('Operations on Objects', () => {
         .putObject({
           Bucket: 'bucket-a',
           Key: srcKey,
-          Body: await fs.readFile(file),
+          Body: await fs.promises.readFile(file),
           ContentType: 'image/jpeg',
         })
         .promise();
@@ -960,7 +1217,7 @@ describe('Operations on Objects', () => {
         .putObject({
           Bucket: 'bucket-a',
           Key: srcKey,
-          Body: await fs.readFile(file),
+          Body: await fs.promises.readFile(file),
           ContentType: 'image/jpeg',
         })
         .promise();
@@ -991,7 +1248,7 @@ describe('Operations on Objects', () => {
         .putObject({
           Bucket: 'bucket-a',
           Key: srcKey,
-          Body: await fs.readFile(file),
+          Body: await fs.promises.readFile(file),
           ContentType: 'image/jpeg',
         })
         .promise();
@@ -1022,7 +1279,7 @@ describe('Operations on Objects', () => {
         .putObject({
           Bucket: 'bucket-a',
           Key: key,
-          Body: await fs.readFile(file),
+          Body: await fs.promises.readFile(file),
           ContentType: 'image/jpeg',
         })
         .promise();
