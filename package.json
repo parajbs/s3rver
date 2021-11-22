@@ -53,6 +53,12 @@
     "he": "^1.2.0",
     "koa": "^2.12.1",
     "koa-logger": "^3.2.0",
+    "fs-extra": "^9.0.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-session": "^5.5.1",
+    "koa-passport": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "koa-static-server": "^1.5.2",
     "lodash": "^4.17.20",
     "statuses": "^2.0.0",
     "winston": "^3.0.0"
@@ -79,7 +85,10 @@
     "p-map": "4.0.0",
     "prettier": "2.4.1",
     "request": "2.88.2",
-    "request-promise-native": "1.0.9"
+    "request-promise-native": "1.0.9",
+    "bufferutil": "4.0.1",
+    "utf-8-validate": "5.0.2",
+    "gun": "github:amark/gun"
   },
   "lint-staged": {
     "*.js": "eslint --cache --fix",

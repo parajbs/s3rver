@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+
+<html ng-app="aws-js-s3-explorer">
+<head>
+    <title>AdminConsole (v1.0.0)</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--
+    <link rel="shortcut icon" href="https://aws.amazon.com/favicon.ico">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" integrity="sha384-PmY9l28YgO4JwMKbTvgaS7XNZJ30MK9FAZjjzXtlqyZCqBY6X6bXIkM++IkyinN+" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap-theme.min.css" integrity="sha384-jzngWsPS6op3fgRCDTESqrEJwRKck+CILhJVO5VvaAZCq8JYf8HsR/HPpBOOPZfR" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+-->	
+	
+    <link rel="shortcut icon" href="./assets/images/favicon.ico">
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+   <link rel="stylesheet" href="./assets/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="./assets/css/all.css">
+    <link rel="stylesheet" href="./assets/css/dataTables.bootstrap.min.css">	
+<style type="text/css">
+
+#page-wrapper {
+    width: 100%;
+    padding: 5px 15px;
+}
+
+#tb-s3objects {
+    width: 100% !Important;
+}
+
+a {
+    color: #333;
+}
+
+
+
+a:hover {
+  color: #fff;
+}	
+	
+	
+	
+
+body {
+    /*font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;*/
+    font-family: "Open Sans", sans-serif;
+    background-color: #fff;
+    border-color: #337ab7;
+    background-image: -webkit-linear-gradient(top,#ddd 0,#111 100%);
+    background-image: -o-linear-gradient(top,#ddd 0,#fff 100%);
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#ddd),to(#fff));
+    background-image: linear-gradient(to bottom,#ddd 0,#fff 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ddd', endColorstr='#fff', GradientType=0);
+    background-repeat: repeat-x;		
+}
+
+td {
+    /*font: 12px "Lucida Grande", Helvetica, Arial, sans-serif;*/
+    font-family: "Open Sans", sans-serif;
+}
+
+.title {
+    padding: 1px 12px;
+    font-size: 50px;
+
+	    text-shadow:3px 2px rgba(255,165,0,.45);
+	font-family: fantasy;
+	color:  rgba(255,255,255,.99);
+}
+	
+.title:hover {
+   text-shadow:2px 3px rgba(85,85,85,.75);	
+}
+
+.input-group-addon {
+    min-width: 162px;
+}
+
+.bottom-marg-10 {
+    margin-bottom: 10px;
+}
+
+.bottom-marg-10-m {
+    margin-bottom: -25px;
+}
+	
+
+.up_accinfo {
+    margin-top: -45px;
+}
+	
+	
+.breadcrumb {
+    margin-bottom: 0;
+}
+
+.checkbox {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#navbuttons .btn {
+    padding: 10px 25px;
+}
+
+.tab-content {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    padding: 10px;
+    border-bottom: 1px solid #dddddd;
+    border-radius: 0 0 4px 4px;
+}
+
+.nav-tabs {
+    margin-bottom: 0;
+}
+
+
+.dropzone.dragover {
+    /*border: 1px solid #0088CC;*/
+    /*border: 2px dashed #0088CC;*/
+    /*outline: 4px dashed #0088CC;*/
+    /*outline-radius: 5px;*/
+    box-shadow: 0 0 3pt 2pt #0088CC;
+    /*border: 5px dashed #0088CC;*/
+    /*padding: 5px;*/
+    /*outline: 5px dashed #0088CC;*/
+}
+
+#upload-tbody .progress {
+  margin-bottom: 0;
+}
+
+.uploaderror, .trasherror {
+    color: #AF0000;
+}
+
+.trashdeleted {
+    color: #00AF00;
+}
+
+table.dataTable tbody tr {
+    cursor: pointer;
+}
+
+#TrashModal77 {
+    width: 700px;
+}
+
+.modal-header {
+    background-color: #337;
+    color: #FFFFFF;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+.modal-header button.close {
+    color: #FFFFFF;
+}
+
+.alert table {
+    width: 100%;
+    border: 3px solid white;
+    border-collapse: collapse;
+    font-size: 1.5rem;
+}
+
+.alert caption {
+    opacity: 0;
+    margin: 0;
+    height: 0;
+}
+
+.alert tr {
+    /*background: rgb(251, 174, 44);*/
+    border-bottom: 2px solid white;
+    border-top: 3px solid white;
+}
+
+/*
+.alert tr:nth-child(even) {
+    background: ckground: rgb(249, 228, 130);
+}
+*/
+
+.alert th {
+    background: rgb(65, 62, 61);
+    color: white;
+    padding: .6em 1em .3em;
+    text-align: left;
+    border-bottom: 3px solid white;
+}
+
+.alert th:first-child {
+    width: 15%;
+}
+
+.alert th,
+.alert td {
+    vertical-align: middle;
+    border-left: 3px solid white;
+}
+
+.alert td {
+    padding: .4em 1em;
+}
+
+.alert table {
+    color: #000000;
+}
+
+.progress-bar {
+    min-width: 25px;
+    width: 0%;
+}
+
+@media (min-width: 768px) {
+  .modal-xl {
+    width: 90%;
+   max-width:1200px;
+  }
+}
+
+.btn-group-vertical2 {
+    position: relative;
+    /* display: inline-block; */
+    vertical-align: middle;
+    text-align: center;
+    padding: 30px 0px 35px;
+}
+
+.panel-body1 {
+    padding-top: 5%;
+}
+
+.panel-body2 {
+  padding-bottom: 22%;
+}
+
+.fa2x {
+    font-weight: 900;
+    font-size: 150px;
+}
+
+.fa2x {
+    font-weight: 900;
+    font-size: 150px;
+	color: #fff;
+}	
+	
+	
+.panel-heading2 {
+    padding: 10px 15px;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #337ab7;
+    background-image: -webkit-linear-gradient(top,#337 0,#2e6da4 100%);
+    background-image: -o-linear-gradient(top,#337 0,#2e6da4 100%);
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#337),to(#2e6da4));
+    background-image: linear-gradient(to bottom,#337 0,#2e6da4 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff337', endColorstr='#ff2e6da4', GradientType=0);
+    background-repeat: repeat-x;
+	box-shadow: 0 0 4pt 2pt #333;
+}
+
+li {display:inline-block}
+input, textarea {display:block}
+
+.modal-dialog2 {
+    position: relative;
+    width: 775px;
+    margin: 30px auto;
+}
+
+.fa-info-circle {
+   text-shadow:5px 5px rgba(255,165,0,.75)
+}		
+
+.fa-lock {
+   text-shadow:5px 5px rgba(255,165,0,.75)
+}	
+
+.fa-hdd {
+   text-shadow:5px 5px rgba(255,165,0,.75)
+}	
+
+.fa-plus {
+   text-shadow:5px 5px rgba(255,165,0,.75)
+}
+
+.fa-user {
+   text-shadow:5px 5px rgba(255,165,0,.75)
+}	
+	
+.fa-cog {
+   text-shadow:5px 5px rgba(255,165,0,.75)
+}
+	
+.fa-lock {
+   text-shadow:5px 5px rgba(255,165,0,.75)
+}	
+
+.accsizemsg{
+
+    font-size: 15px;
+	color: #000;
+}	
+
+pre {
+    overflow: hidden;
+}	
+	
+	
+    </style>
+</head>
+
+	
+<!-- DEBUG: Enable this for red outline on all elements -->
+<body>
+    <!-- Modal AdminMenu dialog -->
+    <div id="AdminMenuModal" class="modal fade" ng-controller="AdminMenuController" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="settings_form_ad" ng-submit="update()">
+                    <fieldset>
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" data-i18n='adminmenu_box'>AdminConsole: Admin-Menu</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="col-md-18">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+					    <p data-i18n='createuser_text'><b>CreateUser</b>:<label for="createuser">Please input new User-Name ! AccountId are generated!</label></p>
+
+                                        <div class="input-group bottom-marg-10" ng-hide="settings.buckets.length && settings.selected_bucket!=''">
+                                            <span class="input-group-addon">AccountId</span>
+                                            <input id="accountid" name="accoutid" ng-model="settings.accountid" type="text" class="form-control" placeholder="3453h5lh3kl5h3l5h34l5h3l45hl34h5lk34h5l345" value="777777"  disabled  />
+                                        </div>
+
+
+
+                                        <div class="input-group bottom-marg-10" ng-hide="settings.buckets.length && settings.selected_bucket!=''">
+                                            <span class="input-group-addon">Username</span>
+					    <input id="username" name="username" ng-model="settings.username" type="text" class="form-control" data-i18n='[placeholder]username_plh' placeholder='Username4' ng-required="!buckets.length"/>
+                                        </div>
+
+
+                                        <p data-i18n='authentication_text'><b>Authentication</b>: Please provide any credentials needed to access the bucket.<p id="auth_p"></p>
+                                        <div class="input-group bottom-marg-10">
+                                            <span class="input-group-addon">Authentication</span>
+                                            <select name="county" class="form-control" ng-model="settings.auth" required>
+                                                <option value="auth" data-i18n='privatebucket_sl'>Private 3Bucket (create new AWS credentials)</option>
+
+                                            </select>
+                                        </div>
+                                        <p id="cred_p" ng-hide="settings.auth=='anon'" data-i18n='credentials_text'><b>Credentials</b>: this web page uses the <a href="http://aws.amazon.com/sdk-for-browser/" target="_blank">AWS SDK for JavaScript in the Browser</a>. Your AWS credentials are kept in memory and used by the SDK for authentication. Your secret access key is used to sign API requests but it is <b>not</b> sent to the S3 service.</p>
+                                        <div class="input-group bottom-marg-10" ng-hide="settings.auth=='anon'">
+                                            <span class="input-group-addon">Access Key ID</span>
+                                            <input name="username" type="text" ng-model="settings.cred.accessKeyId" class="form-control" ng-disabled="settings.auth=='anon'" placeholder="access key id" autocomplete="username" required/>
+                                        </div>
+                                        <div class="input-group bottom-marg-10" ng-hide="settings.auth=='anon'">
+                                            <span class="input-group-addon">Secret Access Key</span>
+                                            <input name="secretkey" type="password" ng-model="settings.cred.secretAccessKey" class="form-control"  placeholder="secret access key" autocomplete="current-password" required/>
+                                        </div>
+                                        <div class="input-group bottom-marg-10" ng-show="settings.auth=='temp'">
+                                            <span class="input-group-addon">Session Token</span>
+                                            <input name="token" type="text" ng-model="settings.cred.sessionToken" class="form-control" ng-disabled="settings.auth!='temp'" placeholder="session token"  autocomplete="token" required/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="form-group">
+
+                                <div class="col-sm-offset-2 col-sm-10">
+							
+                                   <div  id="adminmenu_createuser_msg" class="btn accsizemsg"></div>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n='adminmenu_cancel_btn'>Cancel</button>
+
+                                    <button id="adminmenu_createuser_btn" type="submit" class="btn btn-primary" data-i18n='adminmenu_createuser_btn'><i class='fa fa-plus fa-lg'></i>&nbsp;&nbsp; CreateUser</button>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+	
+    <!-- Modal UserProfile dialog -->
+    <div id="UserProfileModal" class="modal fade" ng-controller="UserProfileController" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="settings_form_up" ng-submit="update_up()">
+                    <fieldset>
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title" data-i18n='setting_box'>AdminConsole: Settings</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="col-md-18">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+										
+                                        <p data-i18n='userprofile_text'><b>Account-Info</b>: Information about your User-Profile.</p>			
+<pre>
+<center><div id="up_account_info" data-i18n='up_account_info'>Account-Info:</div></center>
+<div class="up_accinfo">
+                                        <div class="input-group bottom-marg-10-m" ng-hide="settings.auth=='anon'">
+                                            <span class="input-group-addon" data-i18n='up_accountnumber'>AccessKeyID</span>
+                                            <input id="up_accountnumber" name="up_accountnumber" type="text" ng-model="settings.up_accountnumber" class="form-control"  placeholder="up_accountnumber"  disabled />
+                                        </div>
+                                        <div class="input-group bottom-marg-10-m" ng-hide="settings.auth=='anon'">
+                                            <span class="input-group-addon" data-i18n='up_displayname'>SecretAccessKeyId</span>
+                                            <input id="up_displayname" name="up_displayname" type="text" class="form-control"  disabled />
+                                        </div>
+                                        <div class="input-group bottom-marg-10-m" ng-hide="settings.auth=='anon'">
+                                            <span class="input-group-addon" data-i18n='up_createdDate'>AccessKeyID</span>
+                                            <input id="up_createddate" name="up_createddate" type="text" ng-model="settings.up_createddate" class="form-control"  placeholder="up_createddate"  disabled />
+                                        </div>
+
+                                        <div class="input-group bottom-marg-10-m" ng-hide="settings.auth=='anon'">
+                                            <span class="input-group-addon" data-i18n='up_webUsername'>AccessKeyID</span>
+                                            <input id="up_webusername" name="up_webusername" type="text" ng-model="settings.up_webusername" class="form-control"  placeholder="up_webusername"  autocomplete="username" disabled />
+                                        </div>
+                                        <div class="input-group bottom-marg-10-m" ng-hide="settings.auth=='anon'">
+                                            <span class="input-group-addon" data-i18n='up_webPassword'>SecretAccessKeyId</span>
+                                            <input id="up_webpassword" name="up_webpassword" type="password" ng-model="settings.up_webpassword" class="form-control"  placeholder="up_webpassword" autocomplete="current-password" disabled />
+                                        </div>
+
+                                        <div class="input-group bottom-marg-10-m" ng-hide="settings.auth=='anon'">
+                                            <span class="input-group-addon" data-i18n='up_secretaccessKeyId'>SecretAccessKeyId</span>
+                                            <input id="up_secretaccesskeyid" name="up_secretaccesskeyid" type="password" ng-model="settings.up_secretaccesskeyid" class="form-control"  placeholder="up_secretaccesskeyid" autocomplete="current-password" disabled />
+                                        </div>
+                                        <div class="input-group bottom-marg-10-m" ng-hide="settings.auth=='anon'">
+                                            <span class="input-group-addon" data-i18n='up_accessKeyId'>AccessKeyID</span>
+                                            <input id="up_accesskeyid" name="up_accesskeyid" type="text" ng-model="settings.up_accesskeyid" class="form-control"  placeholder="up_accesskeyid" autocomplete="username2" disabled />
+                                        </div>
+                                        <div class="input-group bottom-marg-10-m" ng-hide="settings.auth=='anon'">
+                                            <span class="input-group-addon" data-i18n='up_accountId'>SecretAccessKeyId</span>
+                                            <input id="up_accountid" name="up_accountid" type="text" ng-model="settings.up_accountid" class="form-control"  placeholder="up_accountid" disabled />
+                                        </div>									
+</div>
+</pre>															
+										
+                                        <p data-i18n='userprofile_language'><b>Language</b>: Please select the AdminConsole language.</p>	
+                                    	<center><ul class="switch-locale"><li><a href="#" data-locale="en">English</a></li><li><a href="#" data-locale="de">Deutsch</a></li></ul></center>									
+                                        <div class="input-group bottom-marg-10">
+                                            <span class="input-group-addon" data-i18n='up_language_info'>Language</span>
+                                            <select id="edit2" class="form-control" >
+                                                <option value="en" data-i18n='up_language_sl_en'>English</option>
+                                                <option value="de" data-i18n='up_language_sl_de'>German</option>
+                                                <option value="fr" data-i18n='up_language_sl_fr'>Frensh</option>
+                                            </select>
+                                        </div>
+
+										
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button id="but_show_pw" type="button" class="btn btn-default" data-i18n='setting_showPW_btn'>Show Password</button>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n='setting_cancel_btn'>Cancel</button>
+                                    <button type="submit" class="btn btn-primary" data-i18n='setting_save_btn'><i class='fa fa-cloud-download-alt fa-lg'></i>&nbsp;Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>	
+	
+	
+	
+	
+	
+	
+
+    <!-- Info dialog -->
+    <div id="InfoModal" class="modal fade" ng-controller="InfoController" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" data-i18n='information_box'>AdminConsole: Information</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-18">
+                        <ul class="nav nav-tabs" data-tabs="tabs">
+                            <li role="presentation" class="active"><a href="#about" data-toggle="tab" data-i18n='about_tab'>About</a></li>
+                            <li role="presentation"><a href="#cors" ng-hide="!info.bucket || !info.cors" data-toggle="tab">CORS</a></li>
+                            <li role="presentation"><a href="#corsref" data-toggle="tab" data-i18n='faq_tab'>FAQ...</a></li>
+
+                        </ul>
+                        <div id="my-tab-content" class="tab-content">
+                            <div class="tab-pane active" id="about">
+                                <br/>
+                                <p data-i18n='about_text1'>s3rver - AdminConsole is an frontend for uses with S3rver version bigger 4.0.0 !</p>
+                                <p  data-i18n='about_text2'>- managing users</p>
+                                <p  data-i18n='about_text3'>- S3explorer v2-alpha intigrate for S3rver</p>
+                                <p  data-i18n='about_text4'>- etc.</p>
+                                <p  data-i18n='about_text5'>-</p>
+				<p  data-i18n='about_text6'>AdminConsole V.1.0</p>
+				<p><a href="https://github.com/parajbs" style="color: #333" >parajbs</a></p>
+                            </div>
+                            <div class="tab-pane" id="cors" ng-hide="!info.cors">
+                                <br/>
+                                <p>The currently-configured CORS Configuration for {{info.bucket}} is below.</p>
+                                <pre><span id="info-cors"></span></pre>
+                            </div>
+                            <div class="tab-pane" id="corsref">
+                                <br/>
+<p data-i18n='faq_text1'>
+JavaScript in the browser cannot display the contents of an Amazon S3 bucket unless the bucket has the proper cross-origin resource sharing (CORS) configuration.
+</p>
+<p data-i18n='faq_text2'>
+To configure CORS, you create a CORS configuration that identifies the origins allowed to access your bucket and the operations (HTTP methods) supported.
+</p>
+<p data-i18n='faq_text3'>
+To do this, select your bucket in the buckets panel of the Amazon S3 Console and click to reveal Permissions in the Properties pane. Click Edit CORS Configuration. The CORS Configuration Editor panel will open up with a field where you can enter a CORS Configuration. Enter a configuration similar to the following:
+</p>
+                                    
+<pre>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"&gt;
+    &lt;CORSRule&gt;
+        &lt;AllowedOrigin&gt;*&lt;/AllowedOrigin&gt;
+        &lt;AllowedMethod&gt;GET&lt;/AllowedMethod&gt;
+        &lt;AllowedMethod&gt;POST&lt;/AllowedMethod&gt;
+        &lt;AllowedMethod&gt;PUT&lt;/AllowedMethod&gt;
+        &lt;AllowedMethod&gt;HEAD&lt;/AllowedMethod&gt;
+        &lt;MaxAgeSeconds&gt;3000&lt;/MaxAgeSeconds&gt;
+        &lt;AllowedHeader&gt;*&lt;/AllowedHeader&gt;
+        &lt;ExposeHeader&gt;ETag&lt;/ExposeHeader&gt;
+        &lt;ExposeHeader&gt;x-amz-meta-myheader&lt;/ExposeHeader&gt;
+    &lt;/CORSRule&gt;
+&lt;/CORSConfiguration&gt;
+</pre>							
+<p data-i18n='faq_text4'>
+Please see the project <a target="_blank" href="https://github.com/awslabs/aws-js-s3-explorer/blob/v2-alpha/README.md">README</a> for more specific details on how to create an appropriate CORS configuration.
+</p>                
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n='information_close_btn'>Clo2se</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Error modal -->
+    <div id="ErrorModal" class="modal fade" ng-controller="ErrorController" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">AdminConsole: Error ({{error.code}})</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-18">
+                        <div class="panel-body">
+                            <p>An error was detected: {{error.message}}</p>
+                            <div class="collapse" id="collapseAdvanced">
+                                <div class="well-sm">
+                                    <table class="table table-bordered table-hover table-striped" id="error-table">
+                                        <thead id="error-thead">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Key</th>
+                                                <th>Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="error-tbody">
+                                            <tr ng-repeat="e in error.errors">
+                                                <td>{{$index + 1}}</td>
+                                                <td>{{e.key}}</td>
+                                                <td>{{e.value}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced"><i class="fa fa-cog" aria-hidden="true">&nbsp;</i>Advanced</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Explorer View -->
+    <div id="page-wrapper" ng-controller="ViewController">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-primary dropzone">
+                    <!-- Panel including S3 object table 
+                    <div class="panel-body1">
+                    </div>-->
+                    <!-- Panel including bucket/folder information and controls -->
+                    <div class="panel-heading2 clearfix">
+                        <!-- Bucket selection and breadcrumbs -->
+                        <div class="btn-group-vertical2">
+                            <!-- Utility name -->
+                            <div class="title">
+			    -&nbsp; s3rver - AdminConsole&nbsp; -
+                            </div>
+						<center><h1><div id="uname"></div></h1></center>		
+                        </div>
+                        <!-- Folder/Bucket radio group and progress spinner -->
+                        <div id="navbuttons" class="hidden">
+                            <div>
+                                <!-- Info/Refresh/Settings buttons -->
+                                <div class="btn-group-vertical2">
+				    <span id="console-info" style="cursor: pointer;" class="btn fa fa-info-circle fa2x" title="Info" data-target="#InfoModal" data-toggle="modal"></span>
+                                    <a id="s3explorer" style="cursor: pointer;" class="btn fa fa-hdd fa2x" title="S3-Explorer" href="/s3explorer"></a>
+                                    <span id="admin-menu" style="cursor: pointer;" class="btn fa fa-plus fa2x" title="AdminMenu" data-target="#AdminMenuModal" data-toggle="modal"></span>
+                                    <span id="user-profil" style="cursor: pointer;" class="btn fa fa-user fa2x" title="UserProfile" data-target="#UserProfileModal" data-toggle="modal"></span>
+ <!--                                   <span id="bucket-settings" style="cursor: pointer;" class="btn fa fa-cog fa2x" title="Settings" data-target="#SettingsModal" data-toggle="modal"></span>	-->								
+			            <a id="logout"  style="cursor: pointer;" class="btn fa fa-lock fa2x" title="Logout" href="/logout"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Panel including S3 object table
+                    <div class="panel-body2"> 
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<!-- 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cldrpluralruleparser@1.4.0/dist/cldrpluralruleparser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.i18n/1.0.7/jquery.i18n.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.i18n/1.0.7/jquery.i18n.messagestore.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.i18n/1.0.7/jquery.i18n.fallbacks.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.i18n/1.0.7/jquery.i18n.language.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.i18n/1.0.7/jquery.i18n.parser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.i18n/1.0.7/jquery.i18n.emitter.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.i18n/1.0.7/jquery.i18n.emitter.bidi.min.js"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js" integrity="sha384-vhJnz1OVIdLktyixHY4Uk3OHEwdQqPppqYR8+5mjsauETgLOcEynD9oPHhhz18Nw" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.5/angular.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.437.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.0/moment.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/aes.min.js"></script>
+-->
+
+<script src="./assets/js/jquery.min.js"></script>
+<script src="./assets/js/cldrpluralruleparser.min.js"></script>
+<script src="./assets/js/jquery.i18n.min.js"></script>
+<script src="./assets/js/jquery.i18n.messagestore.min.js"></script>
+<script src="./assets/js/jquery.i18n.fallbacks.min.js"></script>
+<script src="./assets/js/jquery.i18n.language.min.js"></script>
+<script src="./assets/js/jquery.i18n.parser.min.js"></script>
+<script src="./assets/js/jquery.i18n.emitter.min.js"></script>
+<script src="./assets/js/jquery.i18n.emitter.bidi.min.js"></script>
+
+<script src="./assets/js/bootstrap.min.js"></script>
+<script src="./assets/js/angular.min.js"></script>
+<script src="./assets/js/bootbox.min.js"></script>
+<script src="./assets/js/moment.min.js"></script>
+<script src="./assets/js/jquery.dataTables.min.js"></script>
+<script src="./assets/js/dataTables.bootstrap.min.js"></script>  
+<script src="./assets/js/crypto-js.min.js"></script>
+<script src="./assets/js/aes.min.js"></script>
+
+
+<script type="text/javascript">		
+// leer variablen
+var zzzuu = '';	
+
+//############
+// Idle Timer
+(function() {
+    const idleDurationSecs = 900;
+    const redirectUrl = '/logout';
+    let idleTimeout;
+
+    const resetIdleTimeout = function() {
+        if(idleTimeout) clearTimeout(idleTimeout);
+        idleTimeout = setTimeout(() => location.href = redirectUrl, idleDurationSecs * 1000);
+    };
+	
+	// Key events for reset time
+    resetIdleTimeout();
+    window.onmousemove = resetIdleTimeout;
+    window.onkeypress = resetIdleTimeout;
+    window.click = resetIdleTimeout;
+    window.onclick = resetIdleTimeout;
+    window.touchstart = resetIdleTimeout;
+    window.onfocus = resetIdleTimeout;
+    window.onchange = resetIdleTimeout;
+    window.onmouseover = resetIdleTimeout;
+    window.onmouseout = resetIdleTimeout;
+    window.onmousemove = resetIdleTimeout;
+    window.onmousedown = resetIdleTimeout;
+    window.onmouseup = resetIdleTimeout;
+    window.onkeypress = resetIdleTimeout;
+    window.onkeydown = resetIdleTimeout;
+    window.onkeyup = resetIdleTimeout;
+    window.onsubmit = resetIdleTimeout;
+    window.onreset = resetIdleTimeout;
+    window.onselect = resetIdleTimeout;
+    window.onscroll = resetIdleTimeout;
+
+})();	
+	
+
+
+//################
+// AES-Decrypt and atob => URLSearchParams
+function aesDecrypt(data) {
+   const key = '6fa979f20126cb08aa645a8f495f6d85'
+   const iv = 'I8zyA4lVhMCaJ5Kg'
+   const cipher = CryptoJS.AES.decrypt(data, CryptoJS.enc.Utf8.parse(key), {
+       iv: CryptoJS.enc.Utf8.parse(iv), // parse the IV 
+       mode: CryptoJS.mode.CBC
+   })
+   return cipher.toString(CryptoJS.enc.Utf8);
+};	
+
+// jquery i18n init	
+const uname = "k2";	
+
+// fill User-Profile  
+var up_users = function() {
+  $('#up_accountnumber').val(zzzuu.id);
+  $('#up_displayname').val(zzzuu.displayName);
+  $('#up_createddate').val(zzzuu.createdDate);
+  $('#up_accountid').val(zzzuu.accountId);
+  $('#up_accesskeyid').val(zzzuu.username);
+  $('#up_secretaccesskeyid[type=password]').val(zzzuu.password);
+  $('#up_webusername').val(zzzuu.username);
+  $('#up_webpassword[type=password]').val(zzzuu.password);
+};	
+
+// load $.i18n().locale
+var set_locale_to = function(locale) {
+  if (locale) {
+     $.i18n().locale = locale;
+  }
+  $('body').i18n();
+  $('#uname').text($.i18n('welcome2', zzzuu.displayName));
+};
+	
+// load $.i18n()
+jQuery(function($) {
+  $.i18n().load( {
+    'de': './assets/i18n/de.json',
+    'en': './assets/i18n/en.json'	  
+  } ).done(function() {
+      $('.switch-locale').on('click', 'a', function(e) {		  
+        e.preventDefault();
+        $.i18n().locale = $(this).data('locale');
+        set_locale_to();
+      });
+    set_locale_to();
+	 up_users(); 
+  });
+});
+	
+	
+// Save SettingMenu in to localstrage
+$(function() {
+	// save language select to localStorage
+	$('#edit').change(function() {
+        localStorage.setItem('consoleLanguage', this.value);
+    });
+    if(localStorage.getItem('consoleLanguage')){
+        $('#edit').val(localStorage.getItem('consoleLanguage'));
+    }
+
+	// save language select to localStorage
+	$('#edit2').change(function() {
+        localStorage.setItem('consoleLanguage2', this.value);
+    });
+    if(localStorage.getItem('consoleLanguage2')){
+        $('#edit2').val(localStorage.getItem('consoleLanguage2'));
+    }	
+	
+	
+	var clickEventType=((document.ontouchstart!==null)?'click':'touchstart');
+	var clickEventType2=((document.ontouchend!==null)?'click':'touchend');	
+//$("#mylink").bind(clickEventType, myClickHandler);
+	
+	//show password
+	$('#but_show_pw').bind(clickEventType +' mousedown', function(e){
+      $('#up_secretaccesskeyid').attr('type','text');
+      $('#up_webpassword').attr('type','text');		
+    });
+	//hidde password 
+	$('#but_show_pw').bind(clickEventType2 +' mouseup', function(e){
+      $('#up_secretaccesskeyid').attr('type','password');
+      $('#up_webpassword').attr('type','password');		
+    });	
+});
+
+	
+// generate new AccountId 
+String.random = function (length) {
+	let radom13chars = function () {
+		return Math.random().toString(16).substring(2, 15)
+	}
+	let loops = Math.ceil(length / 13)
+	return new Array(loops).fill(radom13chars).reduce((string, func) => {
+		return string + func()
+	}, '').substring(0, length)
+}
+
+	
+//####################	
+
+function parseXmlToJson(xml) {
+  const json = {};
+  for (const res of xml.matchAll(/(?:<(\w*)(?:\s[^>]*)*>)((?:(?!<\1).)*)(?:<\/\1>)|<(\w*)(?:\s*)*\/>/gm)) {
+    const key = res[1] || res[3];
+    const value = res[2] && parseXmlToJson(res[2]);
+    json[key] = ((value && Object.keys(value).length) ? value : res[2]) || null;
+  }
+  return json;
+};							
+	
+function checkAccSize(){		
+  $.post('/checkaccsize',   // url
+    {
+          "UserName": "",
+          "Path": "/users",
+          "CreateDate": "nowDate",
+          "accountId": "",
+          "accessKeyId": "",
+          "secretAccessKey": "", 
+          "Arn": "arn:aws:iam::"
+    }, // data to be submit
+	function(data, status, jqXHR) {// success callback
+      var data2 = new XMLSerializer().serializeToString(data);
+      var data3 = new DOMParser().parseFromString(''+data2+'', "application/xml");
+      var data4 = new XMLSerializer().serializeToString(data3.documentElement);
+      console.info('ddaattaa: '+data4);
+      var dataJson = parseXmlToJson(data4);
+      var data5 = JSON.stringify(dataJson);
+      console.log('zzz2222 '+dataJson.checkaccsize_success);	 
+ //        $('#adminmenu_createuser_msg').append( 'msg: ' + dataJson.createuser_success);	
+		//		$('#auth_p').text('');
+	   		
+      if( dataJson.checkaccsize_success <= 9 ) { 
+          document.getElementById('adminmenu_createuser_btn').disabled = false;
+	//	    document.getElementById('adminmenu_createuser_msg').style.visibility="hidden";
+      } else { 
+          document.getElementById('adminmenu_createuser_btn').disabled = true;
+	      document.getElementById('adminmenu_createuser_msg').style.visibility="visible";
+		  $('#adminmenu_createuser_msg').text('10/10 Accounts! ');
+	  }
+	});  
+};
+	
+		
+function getprofileinfo(){		
+  $.post('/getprofileinfo',   // url
+    {
+      "UserName": "",
+      "Path": "/users",
+      "CreateDate": "nowDate",
+      "accountId": "",
+      "accessKeyId": "",
+      "secretAccessKey": "", 
+      "Arn": "arn:aws:iam::"
+  }, // data to be submit
+  function(data, status, jqXHR) {// success callback
+	var data2 = new XMLSerializer().serializeToString(data);
+    var data3 = new DOMParser().parseFromString(''+data2+'', "application/xml");
+    var data4 = new XMLSerializer().serializeToString(data3.documentElement);
+//      console.info('ddaattaa333: '+data4);
+    var dataJson = parseXmlToJson(data4);
+    var data5 = JSON.stringify(dataJson);
+	var trans = atob(dataJson.getprofileinfo_success);	 
+    var aesres = aesDecrypt(trans);
+//      console.log("aesDecrypt33: %s", aesres);	
+    var aesres3 = JSON.parse(''+aesres+'');
+    zzzuu = aesres3;
+//      console.log('zzz3333 '+zzzuu.id);
+  });  
+  return zzzuu;
+};	
+
+
+// window.onload	
+window.onload = function() {
+//  getprofileinfo();
+  document.getElementById("admin-menu").onclick = function fun() {
+    checkAccSize();	
+    $('#adminmenu_createuser_msg').text('');
+	document.getElementById('adminmenu_createuser_msg').style.visibility="visible";	
+  }
+};
+	
+
+//##########################################################	
+	
+
+const s3ExplorerColumns = {
+    check: 0, object: 1, folder: 2, date: 3, timestamp: 4, storageclass: 5, size: 6,
+};
+
+// Cache frequently-used selectors and data table
+const $tb = $('#s3objects-table');
+const $bc = $('#breadcrumb');
+const $bl = $('#bucket-loader');
+
+// Debug utility to complement console.log
+const DEBUG = (() => {
+    const timestamp = () => {};
+    timestamp.toString = () => `[DEBUG ${moment().format()}]`;
+
+    return {
+        log: console.log.bind(console, '%s', timestamp),
+    };
+})();
+
+
+
+//
+// Shared service that all controllers can use
+//
+function SharedService($rootScope) {
+    DEBUG.log('SharedService init');
+    const shared = {
+        settings: null, viewprefix: null, skew: true,
+    };
+    return shared;
+}
+
+
+
+//
+// ViewController: code associated with the main S3 Explorer table that shows
+// the contents of the current bucket/folder and allows the user to downloads
+// files, delete files, and do various other S3 functions.
+//
+// eslint-disable-next-line no-shadow
+function ViewController($scope, SharedService) {
+    DEBUG.log('ViewController init');
+    window.viewScope = $scope; // for debugging
+    $scope.view = {
+        bucket: null, prefix: null, settings: null, objectCount: 0, keys_selected: [],
+    };
+}
+
+
+
+//
+// InfoController: code associated with the Info modal where the user can
+// view bucket policies, CORS configuration and About text.
+//
+// Note: do not be tempted to correct the eslint no-unused-vars error
+// with SharedService below. Doing so will break injection.
+//
+// eslint-disable-next-line no-shadow
+function InfoController($scope) {
+    DEBUG.log('InfoController init');
+    window.infoScope = $scope; // for debugging
+    $scope.info = {
+        cors: null, policy: null, bucket: null, settings: null,
+    };
+}
+
+
+
+
+//
+// UserProfileController: code associated with the Settings dialog where the
+// user provides credentials and bucket information.
+//
+// eslint-disable-next-line no-shadow
+function UserProfileController($scope, SharedService) {
+   
+	DEBUG.log('UserProfileController init');
+    window.settingsScope = $scope; // for debugging
+
+    $scope.settings = {
+        auth: 'auth', region: '', bucket: '', entered_bucket: '', selected_bucket: '', view: 'folder', delimiter: '/', prefix: '',
+    };
+
+    $scope.settings.mfa = { use: 'no', code: '' };
+    $scope.settings.cred = { accessKeyId: '', secretAccessKey: '', sessionToken: '' };
+    $scope.settings.stscred = null;
+	
+
+    // TODO: at present the Settings dialog closes after credentials have been supplied
+    // even if the subsequent AWS calls fail with networking or permissions errors. It
+    // would be better for the Settings dialog to synchronously make the necessary API
+    // calls and ensure they succeed before closing the modal dialog.
+    $scope.update_up = () => {
+        DEBUG.log('UserProfile updated');
+        $('#UserProfileModal').modal('hide');
+    };
+}
+
+	
+
+//######################
+// AdminMenuController: code associated with the Settings dialog where the
+// user provides credentials and bucket information.
+//
+// eslint-disable-next-line no-shadow
+function AdminMenuController($scope, SharedService) {
+    DEBUG.log('AdminMenuController init');
+    window.settingsScope = $scope; // for debugging
+
+    $scope.settings = {
+        auth: 'auth', region: '', bucket: '', entered_bucket: '', selected_bucket: '', view: 'folder', delimiter: '/', prefix: '',
+    };
+
+    $scope.settings.mfa = { use: 'no', code: '' };
+    $scope.settings.cred = { accessKeyId: '', secretAccessKey: '', sessionToken: '' };
+    $scope.settings.stscred = null;
+    $scope.settings.accountid = String.random(64);
+
+	var d = new Date();
+    var month = d.getMonth()+1;
+    var day = d.getDate();
+    var nowDate = d.getFullYear() + '-' +
+        ((''+month).length<2 ? '0' : '') + month + '-' +
+        ((''+day).length<2 ? '0' : '') + day;
+
+	function parseXmlToJson(xml) {
+      const json = {};
+      for (const res of xml.matchAll(/(?:<(\w*)(?:\s[^>]*)*>)((?:(?!<\1).)*)(?:<\/\1>)|<(\w*)(?:\s*)*\/>/gm)) {
+        const key = res[1] || res[3];
+        const value = res[2] && parseXmlToJson(res[2]);
+        json[key] = ((value && Object.keys(value).length) ? value : res[2]) || null;
+      }
+      return json;
+    };		
+	
+    // TODO: at present the Settings dialog closes after credentials have been supplied
+    // even if the subsequent AWS calls fail with networking or permissions errors. It
+    // would be better for the Settings dialog to synchronously make the necessary API
+    // calls and ensure they succeed before closing the modal dialog.
+    $scope.update = () => {
+   console.info('date:    '+nowDate);
+		
+	  $.post('/createuser',   // url
+	    {
+          "UserName": $scope.settings.username,
+          "Path": "/users",
+          "CreateDate": nowDate,
+          "accountId": $scope.settings.accountid,
+          "accessKeyId": $scope.settings.cred['accessKeyId'],
+          "secretAccessKey": $scope.settings.cred['secretAccessKey'], 
+          "Arn": "arn:aws:iam::"+$scope.settings.accountid+":user/"+$scope.settings.username
+        }, // data to be submit
+	   function(data, status, jqXHR) {// success callback
+         var data2 = new XMLSerializer().serializeToString(data);
+         var data3 = new DOMParser().parseFromString(''+data2+'', "application/xml");
+         var data4 = new XMLSerializer().serializeToString(data3.documentElement);
+//         console.info('ddaattaa: '+data4);
+         var dataJson = parseXmlToJson(data4);
+         var data5 = JSON.stringify(dataJson);
+         console.log('zzz '+dataJson.createuser_success);	 
+         $('#adminmenu_createuser_msg').append( 'msg: ' + dataJson.createuser_success);	
+		//		$('#auth_p').text('');
+	   });
+       DEBUG.log('AdminMenu updated');
+
+	  //Box close timeout
+	  setTimeout(function(){
+	     $('#AdminMenuModal').modal('hide');
+       }, 1000);
+
+    $scope.settings.mfa = { use: 'no', code: '' };
+    $scope.settings.cred = { accessKeyId: '', secretAccessKey: '', sessionToken: '' };
+    $scope.settings.stscred = null;
+    $scope.settings.username = '';
+    $scope.settings.accountid = String.random(64);
+    };
+}
+//##########################
+
+
+
+//
+// ErrorController: code associated with displaying runtime errors.
+//
+function ErrorController($scope) {
+    DEBUG.log('ErrorController init');
+    window.errorScope = $scope; // for debugging
+    $scope.error = {
+        errors: [], message: '',
+    };
+
+    $scope.$on('broadcastError', (e, args) => {
+        DEBUG.log('ErrorController', 'broadcast error', args);
+
+        $scope.$apply(() => {
+            Object.assign($scope.error, args);
+            DEBUG.log('scope errors', $scope.error.errors);
+        });
+
+        // Launch the error modal
+        $('#ErrorModal').modal({ keyboard: true, backdrop: 'static' });
+    });
+}
+
+
+// Create Angular module and attach factory and controllers
+angular.module('aws-js-s3-explorer', [])
+    .factory('SharedService', SharedService)
+    .controller('ErrorController', ErrorController)
+    .controller('ViewController', ViewController)
+    .controller('InfoController', InfoController)
+    .controller('UserProfileController', UserProfileController)	
+    .controller('AdminMenuController', AdminMenuController);
+
+	
+$(document).ready(() => {
+    DEBUG.log('Version jQuery', $.fn.jquery);
+	getprofileinfo();
+
+    // Show navbuttons
+    $('#navbuttons').removeClass('hidden');
+
+    // Close handler for the alert
+    $('[data-hide]').on('click', (e) => {
+        $(e.currentTarget).parent().hide();
+    });
+
+    // Initialize the moment library (for time formatting utilities) and
+    // launch the initial Settings dialog requesting bucket & credentials.
+    moment().format();
+ //   $('#SettingsModal').modal({ keyboard: true, backdrop: 'static' });
+});
+
+</script>

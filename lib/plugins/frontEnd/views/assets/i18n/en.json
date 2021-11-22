@@ -1,0 +1,66 @@
+{
+    "@metadata": {
+    "authors": [],
+    "last-updated": "2016-10-25",
+    "locale": "en"
+        },
+    "welcome": "Welcome!",
+    "welcome2": "Welcome $1 !",		
+    "information_box": "AdminConsole: Information",
+    "information_close_btn": "Close",
+    "about_tab": "About",
+    "about_text1": "s3rver3 - AdminConsole is an frontend for uses with S3rver version bigger 4.0.0!",
+    "about_text2": "- managing users",
+    "about_text3": "- S3explorer v2-alpha intigrate for S3rver",
+    "about_text4": "- etc",
+    "about_text5": "-",
+    "about_text6": "AdminConsole V.1.0 created by ",
+    "faq_tab": "FAQ...",
+    "faq_text1": "JavaScript in the browser cannot display the contents of an Amazon S3 bucket unless the bucket has the proper cross-origin resource sharing (CORS) configuration.",
+    "faq_text2": "To configure CORS, you create a CORS configuration that identifies the origins allowed to access your bucket and the operations (HTTP methods) supported.",
+    "faq_text3": "To do this, select your bucket in the buckets panel of the Amazon S3 Console and click to reveal Permissions in the Properties pane. Click Edit CORS Configuration. The CORS Configuration Editor panel will open up with a field where you can enter a CORS Configuration. Enter a configuration similar to the following:",
+    "faq_text4": "Please see the project README for more specific details on how to create an appropriate CORS configuration.",
+    "adminmenu_box": "AdminConsole: Admin-Menu",
+    "adminmenu_cancel_btn": "Cancel",
+    "adminmenu_createuser_btn": "CreateUser",
+    "createuser_text": "CreateUser:Please input new User-Name ! AccountId is generated!",
+    "accountid_plh": "Username",
+    "username_plh": "Username",
+    "authentication_text": "Authentication: Please provide any credentials needed to access the bucket.",
+    "privatebucket_sl": "Private Bucket (create new AWS credentials)",
+    "credentials_text": "Credentials: this web page uses the AWS SDK for JavaScript in the Browser. Your AWS credentials are kept in memory and used by the SDK for authentication. Your secret access key is used to sign API requests but it is not sent to the S3 service.",
+    "setting_box": "AdminConsole: Settings",
+    "setting_showPW_btn": "Show Password",		
+    "setting_cancel_btn": "Cancel",
+    "setting_save_btn": "Save",
+    "language_text": "Language: Please select the AdminConsole language.",
+    "language_info": "Language",
+    "language_sl_en": "English",
+    "language_sl_de": "German",
+    "language_sl_fr": "Frensh",
+		
+	"userprofile_text": "User-Profile: Information about your User-Profile.",
+
+	"up_account_info": "Account-Info: ", 
+	"up_accountnumber": "Accountnumber: ",
+	"up_displayname": "Displayname: ",
+	"up_createdDate": "Created-Date: ",
+	"up_accountId": "AccountId: ",
+	"up_accessKeyId": "AAccessKeyId: ",
+	"up_secretaccessKeyId": "SecretaccessKeyId: ",
+	"up_webUsername": "WebUsername: ",
+	"up_webPassword": "WebPassword: ",
+		
+		
+		
+    "userprofile_language": "Language: Please select the AdminConsole language.",	
+    "up_language_info": "Language",
+    "up_language_sl_en": "English",
+    "up_language_sl_de": "German",
+    "up_language_sl_fr": "Frensh",			
+		
+		
+		
+
+    "dummy": " "
+}

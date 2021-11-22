@@ -1,0 +1,69 @@
+{
+    "@metadata": {
+    "authors": [],
+    "last-updated": "2016-10-25",
+    "locale": "de"
+        },
+    "welcome": "Hallo!",
+    "welcome2": "Hallo $1 !",			
+    "information_box": "AdminConsole: Information",
+    "information_close_btn": "Schliessen",
+    "about_tab": "About",
+    "about_text1": "s3rver3 - AdminConsole ist ein Frontend, welches mit S3rver Version 4.0.0 kompatibel ist!",
+    "about_text2": "- Benutzer verwalten",
+    "about_text3": "- S3explorer v2-alpha integriert in S3rver",
+    "about_text4": "- usw.",
+    "about_text5": "-",
+    "about_text6": "AdminConsole V.1.0 erstellt von",
+    "faq_tab": "FAQ...",
+    "faq_text1": "JavaScript im Browser kann den Inhalt eines Amazon S3-Buckets nicht anzeigen, es sei denn, der Bucket hat die richtige Cross-Origin Resource Sharing (CORS)-Konfiguration.",
+    "faq_text2": "Um CORS zu konfigurieren, erstellen Sie eine CORS-Konfiguration, die den Ursprung identifiziert, die auf Ihren Bucket zugreifen darf, und die unterstuetzten Operationen (HTTP-Methoden).",
+    "faq_text3": "Waehlen Sie dazu Ihren Bucket im Bucket-Bereich der Amazon S3-Konsole aus und klicken Sie auf , um Berechtigungen im Eigenschaftenbereich anzuzeigen. Klicken Sie auf CORS-Konfiguration bearbeiten. Das Bedienfeld CORS-Konfigurationseditor wird mit einem Feld geoeffnet, in das Sie eine CORS-Konfiguration eingeben koennen. Geben Sie eine Konfiguration aehnlich der folgenden ein:",
+    "faq_text4": "Weitere Informationen zum Erstellen einer geeigneten CORS-Konfiguration finden Sie in der README-Datei des Projekts.",
+    "adminmenu_box": "AdminConsole: Admin-Menu",
+    "adminmenu_cancel_btn": "Abbrechen",
+    "adminmenu_createuser_btn": "Benutzer erstellen",
+    "createuser_text": "Benutzer anlegen:Bitte neuen Benutzernamen eingeben ! AccountId wird generiert!",
+    "username_plh": "Benutzername",
+    "authentication_text": "Authentifizierung: Geben Sie alle erforderlichen Anmeldeinformationen an, um den Zugriff auf das Bucket zu bekommen!",
+    "privatebucket_sl": "Privater Bucket (neue AWS-Anmeldeinformationen erstellen)",
+    "credentials_text": "Anmeldeinformationen: Diese Webseite verwendet das AWS SDK - JavaScript im Browser. Ihre AWS-Anmeldeinformationen werden im Speicher aufbewahrt und vom SDK zur Authentifizierung verwendet. Ihr geheimer Zugriffsschluessel wird zum Signieren von API-Anfragen verwendet, aber nicht an den S3-Dienst gesendet.",
+    "setting_box": "AdminConsole: Einstellungen",
+    "setting_showPW_btn": "Zeige Passwort",	
+    "setting_cancel_btn": "Abbrechen",
+    "setting_save_btn": "Sichern",
+    "language_text": "Sprache: Bitte waehlen Sie die AdminConsole-Sprache aus!",
+    "language_info": "Sprache",
+    "language_sl_en": "Englisch",
+    "language_sl_de": "Deutsch",
+    "language_sl_fr": "Franzoesisch",
+
+	"userprofile_text": "Benutzer-Profile: Informationen zu Ihrem Benutzer-Profil.",	
+
+		
+	"up_account_info": "Account-Info: ", 
+	"up_accountnumber": "Account-Nummer: ",
+	"up_displayname": "Anzeigename: ",
+	"up_createdDate": "Erstell-Datum: ",
+	"up_accountId": "AccountId: ",
+	"up_accessKeyId": "AAccessKeyId: ",
+	"up_secretaccessKeyId": "SecretaccessKeyId: ",
+	"up_webUsername": "WebUsername: ",
+	"up_webPassword": "WebPassword: ",
+				
+		
+		
+		
+		
+		
+		
+		
+    "userprofile_language": "Sprache: Bitte waehlen Sie die AdminConsole-Sprache aus!",			
+    "up_language_info": "Sprache",
+    "up_language_sl_en": "Englisch",
+    "up_language_sl_de": "Deutsch",
+    "up_language_sl_fr": "Franzoesisch",		
+		
+
+    "dummy": " "
+}

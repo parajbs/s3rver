@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AdminConsole (v1.0.0)</title>
+
+<style>	
+	
+	
+body {
+    /*font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;*/
+    font-family: "Open Sans", sans-serif;
+    background-color: #fff;
+    border-color: #337ab7;
+    background-image: -webkit-linear-gradient(top,#ddd 0,#111 100%);
+    background-image: -o-linear-gradient(top,#ddd 0,#fff 100%);
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#ddd),to(#fff));
+    background-image: linear-gradient(to bottom,#ddd 0,#fff 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ddd', endColorstr='#fff', GradientType=0);
+    background-repeat: repeat-x;	
+}
+
+td {
+    /*font: 12px "Lucida Grande", Helvetica, Arial, sans-serif;*/
+    font-family: "Open Sans", sans-serif;
+}
+
+
+.title {
+    padding: 40px 1px 30px;
+    font-size: 50px;
+    text-shadow:3px 2px rgba(255,165,0,.45);
+	font-family: fantasy;
+	color:  rgba(85,85,85,.75);
+}
+	
+.title:hover {
+   text-shadow:2px 3px rgba(255,165,0,.75);	
+}		
+	
+.loginform {
+    margin: 10px 1px;
+	padding: 1px 1px;
+	border: px solid transparent;
+	border-color: #337ab7;
+	background-color: #fff;
+	width: 300px;
+	    box-shadow: 0 0 4pt 3pt #333;
+}	
+
+.panel-heading2 {
+	    margin: 1px 1px;
+    padding: 1px 1px;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    background-color: #337ab7;
+    border-color: #337ab7;
+    background-image: -webkit-linear-gradient(top,#337 0,#2e6da4 100%);
+    background-image: -o-linear-gradient(top,#337 0,#2e6da4 100%);
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#337),to(#2e6da4));
+    background-image: linear-gradient(to bottom,#337 0,#2e6da4 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff337', endColorstr='#ff2e6da4', GradientType=0);
+    background-repeat: repeat-x;
+		    box-shadow: 0 0 7pt 3pt #333;
+}	
+	
+
+	
+</style>	
+</head>
+<body>
+  <center><div class="title">- &nbsp;s3rver - LoginConsole&nbsp; -</div></center>
+  <div class="panel-heading2" >
+  <center><form action="/login" method="post" class="loginform" onsubmit="return checkform()">
+    <p>
+      <label>Username:
+        <input type="text" name="username" value="S3RVER1"  autocomplete="username"/>
+      </label>
+    </p>
+    <p>
+      <label>Password : 
+        <input type="password" name="password" value="S3RVER"  autocomplete="current-password"/>
+      </label>
+    </p>
+    <p>
+      <label>Webtoken: 
+        <input type="password" id="webtokenkey" name="webtokenkey" value="111"  autocomplete="new-password" />
+      </label>
+    </p>
+    <p>
+		<center><button type="submit" >Log In</button></center>
+    </p>
+  </form></center>
+	</div>
+<script src="./assets/js/jquery.min.js"></script>	
+<script type="text/javascript">		
+
+function checkform() {
+	if (document.getElementById("webtokenkey").value == '')
+	{
+		return false;
+	}
+	else if (document.getElementById("webtokenkey").value.length < 3 )
+	{
+		return false;
+	}
+	return true;
+};	
+		
+</script>		
+</body>
+</html>
